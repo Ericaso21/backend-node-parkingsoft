@@ -9,7 +9,12 @@ import helmet from 'helmet';
 import healthRoutes from './routes/healthRoutes';
 import authController from './routes/authRoutes';
 import roleshRoutes from './routes/rolesRoutes';
-
+import globalRoutes from './routes/globalRoutes';
+import accessPermitsRoutes from './routes/accessPermitsRoutes';
+import userRoutes from './routes/userRoutes';
+import vehicleRoutes from './routes/vehicleRoutes';
+import vehicleTypeRoutes from './routes/vehicleTypeRoutes';
+import ratesRoutes from './routes/ratesRoutes';
 //middelware
 import RecaptchaMiddelware from './middleware/recaptchaMiddelware';
 
@@ -36,10 +41,15 @@ class Server {
     //routes api
     routes():void{
         //route health check status 200 and healthy
-        this.app.use('/health',RecaptchaMiddelware,healthRoutes);
-        this.app.use('/api/authentication',RecaptchaMiddelware,authController);
+        this.app.use('/health',healthRoutes);
+        this.app.use('/api/authentication',authController);
         this.app.use('/api/roles',roleshRoutes);
-
+        this.app.use('/api/global',globalRoutes);
+        this.app.use('/api/accessPermits',accessPermitsRoutes);
+        this.app.use('/api/user',userRoutes);
+        this.app.use('/api/vehicles',vehicleRoutes);
+        this.app.use('/api/vehicleTypes',vehicleTypeRoutes);
+        this.app.use('/api/rates',ratesRoutes);
     }
 
     start():void{

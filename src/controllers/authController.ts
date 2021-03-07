@@ -14,7 +14,7 @@ class AuthController {
             res.status(404).json({status: false, message: 'Todos los campos son obligatorios.'});
         } else {
             // validate if a user exist
-            const exist = await pool.query('SELECT * FROM users WHERE email = ? OR document_number = ?',[req.body.email,req.body.document_number]);
+            const exist = await pool.query('SELECT * FROM users WHERE email = ? OR document_number = ? OR name_user = ?',[req.body.email,req.body.document_number,req.body.name_user]);
             if (Object.entries(exist).length === 0) {
                 // definition json user
                 let user = {
@@ -27,7 +27,8 @@ class AuthController {
                     surname: req.body.surname,
                     second_surname: req.body.second_surname,
                     email: req.body.email,
-                    password_user: req.body.password_user
+                    password_user: req.body.password_user,
+                    created_att: req.body.created_att
                 }
                 // insert user database
                 const insert = await pool.query('INSERT INTO users SET ?', [user]);
@@ -36,8 +37,9 @@ class AuthController {
                     let role = {
                         pk_fk_document_number: req.body.document_number,
                         pk_fk_id_document_type: req.body.pk_fk_id_document_type,
-                        pk_fk_id_roles: req.body.pk_fk_id_roles,
-                        roles_users_status : 0
+                        pk_fk_id_roles: 3,
+                        roles_users_status : 2,
+                        created_att: req.body.created_att
                     }
                     // associate user role to new registered user
                     const role_user = await pool.query('INSERT INTO roles_users SET ?', [role]);
@@ -59,33 +61,37 @@ class AuthController {
 
     // authentication user in database 
     public async authentication (req: Request, res: Response){
+        delete req.body.token;
         // secret jsonwebtoken
         let JWT_SECRET = config.SECRETKEYJSWEBTOKEN;
-        let user = await pool.query('SELECT u.document_number, u.pk_fk_id_document_type, u.fk_id_gender, u.name_user, u.first_name, u.second_name, u.surname, u.second_surname, u.birthdate, u.address, u.telephone, u.email, u.name_file, u.type_file, u.photo_user, u.created_att, u.updated_att, r.name_role, ap.fk_id_modules, ap.view_modules, ap.create_modules, ap.edit_modules, ap.delete_modules FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles INNER JOIN access_permits ap ON r.id_roles = ap.fk_id_roles');
-        res.json(user);
-        // validation required fields
-        /*if (req.body.email == '' || req.body.password_user == '') {
+        let user_auth = await pool.query('SELECT u.document_number, u.pk_fk_id_document_type, u.fk_id_gender, u.name_user, u.first_name, u.second_name, u.surname, u.second_surname, u.birthdate, u.address, u.telephone, u.email, u.name_file, u.type_file, u.photo_user, u.created_att, u.updated_att, r.name_role, ap.fk_id_modules, ap.view_modules, ap.create_modules, ap.edit_modules, ap.delete_modules FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles INNER JOIN access_permits ap ON r.id_roles = ap.fk_id_roles WHERE u.email = ? AND rl.roles_users_status !=0',[req.body.email]);
+        if (Object.entries(user_auth).length === 0) {
+            res.status(404).json({status: false, message: 'El usuario esta desactivado comunicarse con el administrador.'});
+        } else {
+                    // validation required fields
+        if (req.body.email == '' || req.body.password_user == '') {
             res.status(404).json({status: false, message: 'Todos los campos son obligatorios.'});
         } else {
             // exist email user
-            const exist_email = await pool.query('SELECT email FROM users WHERE email = ?',[req.body.email]);
+            const exist_email = await pool.query('SELECT * FROM users WHERE email = ?',[req.body.email]);
             if (Object.entries(exist_email).length === 0) {
+                res.status(404).json({status: false, message: 'Correo electronico ó contraseña incorrectos.'});
+            } else {
                 // exist password user database
-                const exist_password = await pool.query('SELECT password_user FROM users WHERE password_user = ?', [req.body.password_user]);
+                const exist_password = await pool.query('SELECT * FROM users WHERE password_user = ?', [req.body.password_user]);
                 if (Object.entries(exist_password).length === 0) {
+                    res.status(404).json({status: false, message: 'Correo electronico ó contraseña incorrectos.'});
+                } else {
                     // login user database
                     let token = jsonwebtoken.sign(req.body.email, JWT_SECRET);
-                    res.status(200).json({
-                        singend_user: user,
+                    res.status(200).send({
+                        singend_user: user_auth[0],
                         token: token
-                    })
-                } else {
-                    res.status(404).json({status: false, message: 'Correo electronico ó contraseña incorrectos.'});
+                    });
                 }
-            } else {
-                res.status(404).json({status: false, message: 'Correo electronico ó contraseña incorrectos.'});
             }
-        }*/
+        }
+        }
     }
 
 }
