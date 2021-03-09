@@ -15,6 +15,8 @@ class RatesRoutes {
         this.router.get('/list',ratesController.list);
         this.router.get('/getOne/:id',ratesController.getOne);
         this.router.post('/create',ratesController.create);
+        this.router.put('/update/:id',ratesController.update);
+        this.router.delete('/delete/:id',ratesController.delete);
     }
 
 }
