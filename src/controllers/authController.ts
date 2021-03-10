@@ -64,7 +64,8 @@ class AuthController {
         delete req.body.token;
         // secret jsonwebtoken
         let JWT_SECRET = config.SECRETKEYJSWEBTOKEN;
-        let user_auth = await pool.query('SELECT u.document_number, u.pk_fk_id_document_type, u.fk_id_gender, u.name_user, u.first_name, u.second_name, u.surname, u.second_surname, u.birthdate, u.address, u.telephone, u.email, u.name_file, u.type_file, u.photo_user, u.created_att, u.updated_att, r.name_role, ap.fk_id_modules, ap.view_modules, ap.create_modules, ap.edit_modules, ap.delete_modules FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles INNER JOIN access_permits ap ON r.id_roles = ap.fk_id_roles WHERE u.email = ? AND rl.roles_users_status !=0',[req.body.email]);
+        let user_auth = await pool.query('SELECT u.document_number, u.pk_fk_id_document_type, u.fk_id_gender, u.name_user, u.first_name, u.second_name, u.surname, u.second_surname, u.birthdate, u.address, u.telephone, u.email, u.name_file, u.type_file, u.photo_user, u.created_att, u.updated_att FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE u.email = ? AND rl.roles_users_status !=2',[req.body.email]);
+        let user_permit = await pool.query('SELECT m.name_modules, ap.view_modules, ap.create_modules, ap.edit_modules, ap.delete_modules FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles INNER JOIN access_permits ap ON r.id_roles = ap.fk_id_roles INNER JOIN modules m ON ap.fk_id_modules  = m.id_modules WHERE u.email = ? AND rl.roles_users_status !=2',[req.body.email]);
         if (Object.entries(user_auth).length === 0) {
             res.status(404).json({status: false, message: 'El usuario esta desactivado comunicarse con el administrador.'});
         } else {
@@ -85,7 +86,8 @@ class AuthController {
                     // login user database
                     let token = jsonwebtoken.sign(req.body.email, JWT_SECRET);
                     res.status(200).send({
-                        singend_user: user_auth[0],
+                        singend_user: user_auth,
+                        permit: user_permit,
                         token: token
                     });
                 }
