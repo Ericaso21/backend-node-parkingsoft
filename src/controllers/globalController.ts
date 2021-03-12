@@ -36,6 +36,17 @@ class GlobalController {
         let vehicleTypes = await pool.query('SELECT id_vehicle_type, vehicle_name FROM vehicle_types WHERE status_vehicle !=0');
         res.status(200).json(vehicleTypes);
     }
+    // brind data block Types
+    public async listBlockTypes (req: Request, res: Response){
+        let blockTypes = await pool.query('SELECT id_block_type, name_block_type FROM blocks WHERE id_block_type !=0');
+        res.status(200).json(blockTypes);
+    }
+    // vrind data blocks
+    public async listBlock (req: Request, res: Response){
+        let blocks = await pool.query('SELECT b.id_block, bt.name_block_type, b.block_number FROM blocks b INNER JOIN block_types bt ON bt.id_block_type = b.fk_id_block_type WHERE b.block_status != 0');
+        res.status(200).json(blocks);
+    }
+
 }
 
 export const globalController = new GlobalController();

@@ -16,7 +16,7 @@ class AccessPermitsController {
         if (Object.entries(permit).length === 0) {
             res.status(404).json({status: false, message: 'Datos no encontrados.'});
         } else {
-            res.status(200).json(permit);
+            res.status(200).json(permit[0]);
         } 
     }
     // create permits role

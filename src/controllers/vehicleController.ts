@@ -16,7 +16,7 @@ class VehicleController {
         if (Object.entries(vehicle).length === 0) {
             res.status(404).json({status: false, message: 'Vehiculo no encontrado.'});
         } else {
-            res.status(200).json(vehicle);
+            res.status(200).json(vehicle[0]);
         }
     }
 

@@ -16,6 +16,7 @@ import vehicleRoutes from './routes/vehicleRoutes';
 import vehicleTypeRoutes from './routes/vehicleTypeRoutes';
 import ratesRoutes from './routes/ratesRoutes';
 import blockTypesRoutes from './routes/blockTypesRoutes';
+import blockRoutes from './routes/blockRoutes';
 //middelware
 import RecaptchaMiddelware from './middleware/recaptchaMiddelware';
 
@@ -52,6 +53,7 @@ class Server {
         this.app.use('/api/vehicleTypes',vehicleTypeRoutes);
         this.app.use('/api/rates',ratesRoutes);
         this.app.use('/api/blockTypes',blockTypesRoutes);
+        this.app.use('/api/block',blockRoutes);
     }
 
     start():void{

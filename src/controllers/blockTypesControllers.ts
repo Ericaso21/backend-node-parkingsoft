@@ -15,7 +15,7 @@ class BlockTypesController {
         if (Object.entries(blockType).length === 0) {
             res.status(404).json({status: false, message: 'El tipo de bloque no existe.'});
         } else {
-            res.status(200).json(blockType);
+            res.status(200).json(blockType[0]);
         }
     }
     // create block type

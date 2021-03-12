@@ -15,7 +15,7 @@ class VehicleTypeController {
         if (Object.entries(vehicleType).length === 0) {
             res.status(404).json({status: true, message: 'Tipo de vehiculo no encotrado'})
         } else {
-            res.status(200).json(vehicleType);
+            res.status(200).json(vehicleType[0]);
         }
     }
     // create vehicle type

@@ -17,7 +17,7 @@ class RolesController {
         } else {
             return res.status(200).json(getOne[0]);
         }
-        res.status(200).json(getOne);
+        res.status(200).json(getOne[0]);
     }
     //create new role
     public async create (req: Request, res: Response) {

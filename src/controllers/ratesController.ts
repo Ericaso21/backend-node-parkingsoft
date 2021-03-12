@@ -15,7 +15,7 @@ class RatesController {
         if (Object.entries(rate).length === 0) {
             res.status(404).json({status: false, message: 'Tarifa no encontrada.'});
         } else {
-            res.status(200).json(rate);
+            res.status(200).json(rate[0]);
         }
     }
     // creat rate
