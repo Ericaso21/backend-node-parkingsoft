@@ -86,7 +86,7 @@ class AuthController {
                     // login user database
                     let token = jsonwebtoken.sign(req.body.email, JWT_SECRET);
                     res.status(200).send({
-                        singend_user: user_auth,
+                        singend_user: user_auth[0],
                         permit: user_permit,
                         token: token
                     });
