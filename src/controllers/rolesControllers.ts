@@ -5,6 +5,7 @@ class RolesController {
 
     // list database role
     public async list (req: Request, res: Response) {
+        res.header('Cache-Control','private, no-cache, no-store, must-revalidate');
         let sql = await pool.query('SELECT * FROM roles WHERE role_status !=0');
         res.status(200).json(sql);
     }
@@ -15,6 +16,7 @@ class RolesController {
         if (Object.entries(getOne).length === 0) {
             res.status(404).json({status: false, message: 'Rol no encontrado.'})
         } else {
+            res.header('Cache-Control','private, no-cache, no-store, must-revalidate');
             return res.status(200).json(getOne[0]);
         }
         res.status(200).json(getOne[0]);
