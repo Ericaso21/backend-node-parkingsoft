@@ -1,4 +1,4 @@
-import express,{ Application } from 'express';
+import express, { Application } from 'express';
 import morgan from 'morgan';
 import cors from 'cors';
 import methdOverride from 'method-override';
@@ -21,45 +21,45 @@ import ticketsRoutes from './routes/ticketsRoutes';
 //middelware
 import RecaptchaMiddelware from './middleware/recaptchaMiddelware';
 
-class Server { 
+class Server {
 
     public app: Application;
 
-    constructor(){
+    constructor() {
         this.app = express();
         this.config();
         this.routes();
     }
     //config express
-    config():void{
+    config(): void {
         this.app.set('port', process.env.PORT || 3000);
         this.app.use(morgan('dev'));
         this.app.use(cors());
         this.app.use(bodyParser.json());
-        this.app.use(bodyParser.urlencoded({extended: false}));
+        this.app.use(bodyParser.urlencoded({ extended: false }));
         this.app.use(methdOverride());
         this.app.use(helmet());
         this.app.disable('x-powered-by');
     }
     //routes api
-    routes():void{
+    routes(): void {
         //route health check status 200 and healthy
-        this.app.use('/health',healthRoutes);
-        this.app.use('/api/authentication',authController);
-        this.app.use('/api/roles',roleshRoutes);
-        this.app.use('/api/global',globalRoutes);
-        this.app.use('/api/accessPermits',accessPermitsRoutes);
-        this.app.use('/api/user',userRoutes);
-        this.app.use('/api/vehicles',vehicleRoutes);
-        this.app.use('/api/vehicleTypes',vehicleTypeRoutes);
-        this.app.use('/api/rates',ratesRoutes);
-        this.app.use('/api/blockTypes',blockTypesRoutes);
-        this.app.use('/api/block',blockRoutes);
-        this.app.use('/api/tickets',ticketsRoutes);
+        this.app.use('/health', healthRoutes);
+        this.app.use('/api/authentication', RecaptchaMiddelware, authController);
+        this.app.use('/api/roles', RecaptchaMiddelware, roleshRoutes);
+        this.app.use('/api/global', RecaptchaMiddelware, globalRoutes);
+        this.app.use('/api/accessPermits', RecaptchaMiddelware, accessPermitsRoutes);
+        this.app.use('/api/user', RecaptchaMiddelware, userRoutes);
+        this.app.use('/api/vehicles', RecaptchaMiddelware, vehicleRoutes);
+        this.app.use('/api/vehicleTypes', RecaptchaMiddelware, vehicleTypeRoutes);
+        this.app.use('/api/rates', RecaptchaMiddelware, ratesRoutes);
+        this.app.use('/api/blockTypes', RecaptchaMiddelware, blockTypesRoutes);
+        this.app.use('/api/block', RecaptchaMiddelware, blockRoutes);
+        this.app.use('/api/tickets', RecaptchaMiddelware, ticketsRoutes);
     }
 
-    start():void{
-        this.app.listen(this.app.get('port'), () =>{
+    start(): void {
+        this.app.listen(this.app.get('port'), () => {
             console.log('Server on port ', this.app.get('port'))
         });
     }
