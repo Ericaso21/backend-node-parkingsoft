@@ -5,13 +5,24 @@ class TicketsController {
 
     // list tickets 
     public async list(req: Request, res: Response) {
-        let tickets = await pool.query('SELECT t.id_ticket, t.entry_time, t.departure_time, TIMEDIFF(t.departure_time,t.entry_time) AS total_time, t.tickets_status, b.block_number, v.vehicle_plate FROM tickets t INNER JOIN tickets_block tb ON tb.pk_fk_id_ticket = t.id_ticket INNER JOIN vehicles v ON tb.fk_id_vehicle = v.vehicle_plate INNER JOIN blocks b ON tb.pk_fk_id_block = b.id_block WHERE t.tickets_status !=0');
+        let tickets = await pool.query('SELECT t.id_ticket, TIME_FORMAT(t.entry_time, "%H:%i:%s %p") as entry_time, TIME_FORMAT(t.departure_time, "%H:%i:%s %p") as departure_time, SEC_TO_TIME(IF(t.entry_time<t.departure_time, TIMESTAMPDIFF(SECOND,t.entry_time,t.departure_time), TIMESTAMPDIFF(SECOND,t.departure_time,t.entry_time))) AS total_time, t.tickets_status, b.block_number, v.vehicle_plate FROM tickets t INNER JOIN tickets_block tb ON tb.pk_fk_id_ticket = t.id_ticket INNER JOIN vehicles v ON tb.fk_id_vehicle = v.vehicle_plate INNER JOIN blocks b ON tb.pk_fk_id_block = b.id_block WHERE t.tickets_status !=0');
         res.status(200).json(tickets);
+    }
+
+    //get one ticket pdf
+    public async getOnePDF(req: Request, res: Response) {
+        const { id } = req.params;
+        let ticket = await pool.query('SELECT t.id_ticket, TIME_FORMAT(t.entry_time, "%H:%i:%s %p") as entry_time, TIME_FORMAT(t.departure_time, "%H:%i:%s %p") as departure_time, SEC_TO_TIME(IF(t.entry_time<t.departure_time, TIMESTAMPDIFF(SECOND,t.entry_time,t.departure_time), TIMESTAMPDIFF(SECOND,t.departure_time,t.entry_time))) AS total_time, tb.pk_fk_id_block, tb.fk_id_vehicle FROM tickets t INNER JOIN tickets_block tb ON tb.pk_fk_id_ticket = t.id_ticket WHERE t.id_ticket = ?', [id]);
+        if (Object.entries(ticket).length === 0) {
+            res.status(404).json({ status: false, message: 'Ticket no encontrado.' });
+        } else {
+            res.status(200).json(ticket[0]);
+        }
     }
     //get one tickets
     public async getOne(req: Request, res: Response) {
         const { id } = req.params;
-        let ticket = await pool.query('SELECT t.id_ticket, t.entry_time, t.departure_time, t.tickets_status, tb.pk_fk_id_block,tb.fk_id_vehicle FROM tickets t INNER JOIN tickets_block tb ON tb.pk_fk_id_ticket = t.id_ticket WHERE t.id_ticket = ?', [id]);
+        let ticket = await pool.query('SELECT t.id_ticket, DATE_FORMAT(t.entry_time, "%Y-%m-%dT%H:%i:%s") as entry_time, DATE_FORMAT(t.departure_time, "%Y-%m-%dT%H:%i:%s") as departure_time, t.tickets_status, tb.pk_fk_id_block,tb.fk_id_vehicle FROM tickets t INNER JOIN tickets_block tb ON tb.pk_fk_id_ticket = t.id_ticket WHERE t.id_ticket = ?', [id]);
         if (Object.entries(ticket).length === 0) {
             res.status(404).json({ status: false, message: 'Ticket no encontrado.' });
         } else {
@@ -73,7 +84,12 @@ class TicketsController {
             }
             let bt = await pool.query('UPDATE tickets_block SET ? WHERE pk_fk_id_ticket = ?', [block_ticket, id]);
             if (bt) {
-                res.status(200).json({ status: true, message: 'Datos actualizados correctamente.' });
+                let update_block = await pool.query('UPDATE blocks SET block_status = 1 WHERE id_block = ?', [req.body.pk_fk_id_block]);
+                if (update_block) {
+                    res.status(200).json({ status: true, message: 'Datos actualizados correctamente.', id_ticket: id });
+                } else {
+                    res.status(500).json({ status: false, message: 'Error a el actualizar.' });
+                }
             } else {
                 res.status(500).json({ status: false, message: 'Error a el actualizar.' });
             }

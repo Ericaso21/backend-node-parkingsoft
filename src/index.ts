@@ -18,6 +18,7 @@ import ratesRoutes from './routes/ratesRoutes';
 import blockTypesRoutes from './routes/blockTypesRoutes';
 import blockRoutes from './routes/blockRoutes';
 import ticketsRoutes from './routes/ticketsRoutes';
+import billRoutes from './routes/billRoutes';
 //middelware
 import RecaptchaMiddelware from './middleware/recaptchaMiddelware';
 
@@ -56,6 +57,7 @@ class Server {
         this.app.use('/api/blockTypes', RecaptchaMiddelware, blockTypesRoutes);
         this.app.use('/api/block', RecaptchaMiddelware, blockRoutes);
         this.app.use('/api/tickets', RecaptchaMiddelware, ticketsRoutes);
+        this.app.use('/api/bill', billRoutes);
     }
 
     start(): void {
