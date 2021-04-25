@@ -43,6 +43,12 @@ class GlobalController {
     }
     // vrind data blocks
     public async listBlock(req: Request, res: Response) {
+        let blocks = await pool.query('SELECT b.id_block, bt.name_block_type, b.block_number FROM blocks b INNER JOIN block_types bt ON bt.id_block_type = b.fk_id_block_type WHERE b.block_status != 0 AND b.block_status != 2');
+        res.status(200).json(blocks);
+    }
+
+    //validate data blocks close
+    public async listBlockClose(req: Request, res: Response) {
         let blocks = await pool.query('SELECT b.id_block, bt.name_block_type, b.block_number FROM blocks b INNER JOIN block_types bt ON bt.id_block_type = b.fk_id_block_type WHERE b.block_status != 0');
         res.status(200).json(blocks);
     }

@@ -20,6 +20,7 @@ class GlobalRoutes {
         this.router.get('/vehicleType', globalController.listVehicleTypes);
         this.router.get('/blockTypes', globalController.listBlockTypes);
         this.router.get('/blocks', globalController.listBlock);
+        this.router.get('/blockClose', globalController.listBlockClose);
         this.router.get('/vehicle', globalController.listVehicle);
     }
 

@@ -11,12 +11,13 @@ class TicketsRoutes {
         this.config();
     }
 
-    config():void {
-        this.router.get('/list',ticketsController.list);
-        this.router.get('/getOne/:id',ticketsController.getOne);
-        this.router.post('/create',ticketsController.create);
-        this.router.put('/update/:id',ticketsController.update);
-        this.router.delete('/delete/:id',ticketsController.delete);
+    config(): void {
+        this.router.get('/list', ticketsController.list);
+        this.router.get('/getOnePDF/:id', ticketsController.getOnePDF);
+        this.router.get('/getOne/:id', ticketsController.getOne);
+        this.router.post('/create', ticketsController.create);
+        this.router.put('/update/:id', ticketsController.update);
+        this.router.delete('/delete/:id', ticketsController.delete);
     }
 
 }
