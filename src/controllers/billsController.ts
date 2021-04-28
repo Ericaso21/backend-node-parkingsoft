@@ -14,6 +14,12 @@ class BillController {
         }
     }
 
+    //get information bill
+    public async getBill(req: Request, res: Response) {
+        let bill = await pool.query('SELECT b.id_bill , TIME_FORMAT(t.entry_time, "%H:%i:%s %p") as entry_time, TIME_FORMAT(t.departure_time, "%H:%i:%s %p") as departure_time, SEC_TO_TIME(IF(t.entry_time<t.departure_time, TIMESTAMPDIFF(SECOND,t.entry_time,t.departure_time), TIMESTAMPDIFF(SECOND,t.departure_time,t.entry_time))) AS total_time, tb.pk_fk_id_block, tb.fk_id_vehicle, v.fk_document_number, u.first_name, u.surname, DATE_FORMAT(b.date_bill,"%d/%m/%Y") as date_bill, IF(CHAR_LENGTH(FORMAT(b.subtotal_value,3)) = 7, b.subtotal_value, FORMAT(b.subtotal_value,3)) AS subtotal_value, IF(CHAR_LENGTH(FORMAT(b.iva_value,3)) = 7, b.iva_value, FORMAT(b.iva_value,3)) AS iva_value,  IF(CHAR_LENGTH(FORMAT(b.total_value,3)) = 7, b.total_value, FORMAT(b.total_value,3)) AS total_value FROM tickets t INNER JOIN tickets_block tb ON tb.pk_fk_id_ticket = t.id_ticket INNER JOIN vehicles v ON tb.fk_id_vehicle = v.vehicle_plate INNER JOIN users u ON v.fk_document_number = u.document_number INNER JOIN bills b ON b.fk_id_ticket = t.id_ticket WHERE b.bill_status !=0 AND t.tickets_status !=0')
+        res.status(200).json(bill);
+    }
+
     //create bill
     public async create(req: Request, res: Response) {
         delete req.body.token;
@@ -40,6 +46,9 @@ class BillController {
             }
             function val(x: any) {
                 var contador = x.toString().split('.')
+                if (contador[0].length == 2 && contador[1].length == 1) {
+                    return x.toFixed(0)
+                }
                 if (contador[0].length == 2) {
                     return x.toFixed(3)
                 } else if (contador[0].length == 3) {
@@ -70,7 +79,17 @@ class BillController {
             } else {
                 res.status(500).json({ status: false, message: 'No se pudo insertar.' });
             }
-            console.log(bill)
+        }
+    }
+
+    public async deleteBill(req: Request, res: Response) {
+        const { id } = req.params;
+        let updated_att = new Date();
+        let update_bill = await pool.query('UPDATE bills SET bill_status = 0, updated_att = ? WHERE id_bill = ?', [updated_att, id]);
+        if (update_bill) {
+            res.status(200).json({ status: true, message: 'Se ha eliminado correctamente.' })
+        } else {
+            res.status(500).json({ status: false, message: 'No se ha podido eliminar.' })
         }
     }
 

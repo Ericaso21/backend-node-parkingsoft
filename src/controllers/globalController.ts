@@ -28,7 +28,7 @@ class GlobalController {
     }
     // brind data user database+
     public async listUser(req: Request, res: Response) {
-        let users = await pool.query('SELECT u.document_number, u.pk_fk_id_document_type, u.first_name, u.second_name, u.surname, u.second_surname FROM users u INNER JOIN roles_users rol ON u.document_number = rl.pk_fk_document_number WHERE rl.pk_fk_id_roles = 3');
+        let users = await pool.query('SELECT u.document_number, u.pk_fk_id_document_type, u.first_name, u.second_name, u.surname, u.second_surname FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE rl.pk_fk_id_roles = 3');
         res.status(200).json(users);
     }
     // bridn data vehicle types
