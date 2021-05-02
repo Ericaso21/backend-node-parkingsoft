@@ -38,7 +38,7 @@ class GlobalController {
     }
     // brind data block Types
     public async listBlockTypes(req: Request, res: Response) {
-        let blockTypes = await pool.query('SELECT id_block_type, name_block_type FROM blocks WHERE id_block_type !=0');
+        let blockTypes = await pool.query('SELECT id_block_type, name_block_type FROM block_types WHERE block_status !=0');
         res.status(200).json(blockTypes);
     }
     // vrind data blocks
