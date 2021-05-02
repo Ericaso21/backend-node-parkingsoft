@@ -57,7 +57,7 @@ class Server {
         this.app.use('/api/blockTypes', RecaptchaMiddelware, blockTypesRoutes);
         this.app.use('/api/block', RecaptchaMiddelware, blockRoutes);
         this.app.use('/api/tickets', RecaptchaMiddelware, ticketsRoutes);
-        this.app.use('/api/bill', billRoutes);
+        this.app.use('/api/bill', RecaptchaMiddelware, billRoutes);
     }
 
     start(): void {
