@@ -92,6 +92,11 @@ class UserController {
                 password_user: req.body.password_user,
                 updated_att: req.body.updated_att
             }
+            if (user['password_user'] == null) {
+                delete user['password_user']
+            } else {
+                user['password_user'] = req.body.password_user
+            }
             // update user
             let update_user = await pool.query('UPDATE users SET ? WHERE document_number = ?', [user, id]);
             if (update_user) {
