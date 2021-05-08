@@ -27,7 +27,7 @@ class UserController {
             res.status(404).json({ status: false, message: 'Todos los campos son obligatorios.' });
         } else {
             // validate if a user exist
-            const exist = await pool.query('SELECT * FROM users WHERE email = ? OR document_number = ? OR name_user = ?', [req.body.email, req.body.document_number, req.body.name_user]);
+            const exist = await pool.query('SELECT * FROM users WHERE email = ? OR document_number = ?', [req.body.email, req.body.document_number]);
             if (Object.entries(exist).length === 0) {
                 // definition json user
                 let user = {
@@ -75,7 +75,7 @@ class UserController {
     public async update(req: Request, res: Response) {
         delete req.body.token;
         const { id } = req.params;
-        let consultation = await pool.query("SELECT * FROM users WHERE email = ? AND document_number != ? OR document_number = ? AND document_number != ? OR name_user = ? AND document_number != ?", [req.body.email, id, req.body.document_number, id, req.body.name_user, id]);
+        let consultation = await pool.query("SELECT * FROM users WHERE email = ? AND document_number != ? AND document_number != ? OR name_user = ? AND document_number != ?", [req.body.email, id, req.body.document_number, id, req.body.name_user, id]);
         console.log(consultation);
         if (Object.entries(consultation).length === 0) {
             // definition json user
