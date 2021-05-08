@@ -7,6 +7,8 @@ pool.getConnection()
     .then(connection => {
         pool.releaseConnection(connection);
         console.log('DB is connect');
+    }).catch(error => {
+        console.log(error);
     });
 
 export default pool;

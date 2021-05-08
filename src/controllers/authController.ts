@@ -31,7 +31,9 @@ class AuthController {
                     created_att: req.body.created_att
                 }
                 // insert user database
-                const insert = await pool.query('INSERT INTO users SET ?', [user]);
+                const insert = await pool.query('INSERT INTO users SET ?', [user]).catch(error => {
+                    console.log(error);
+                });
                 if (insert) {
                     // definition json role_user
                     let role = {
