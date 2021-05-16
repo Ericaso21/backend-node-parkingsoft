@@ -79,57 +79,64 @@ class AuthController {
     delete req.body.token;
     // secret jsonwebtoken
     let JWT_SECRET = config.SECRETKEYJSWEBTOKEN;
-    let user_auth = await pool.query(
-      "SELECT u.first_name, u.second_name, u.surname, u.second_surname, u.email FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE u.email = ? AND rl.roles_users_status !=2",
-      [req.body.email]
-    );
-    let user_permit = await pool.query(
-      "SELECT m.name_modules, ap.view_modules, ap.create_modules, ap.edit_modules, ap.delete_modules FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles INNER JOIN access_permits ap ON r.id_roles = ap.fk_id_roles INNER JOIN modules m ON ap.fk_id_modules  = m.id_modules WHERE u.email = ? AND rl.roles_users_status !=2",
-      [req.body.email]
-    );
-    if (Object.entries(user_auth).length === 0) {
+    if (req.body.email == "" || req.body.password_user == "") {
       res.status(404).json({
         status: false,
-        message:
-          "El usuario esta desactivado comunicarse con el administrador.",
+        message: "Todos los campos son obligatorios.",
       });
     } else {
-      // validation required fields
-      if (req.body.email == "" || req.body.password_user == "") {
+      let user_auth = await pool.query(
+        "SELECT u.first_name, u.second_name, u.surname, u.second_surname, u.email, u.name_file FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE u.email = ? AND rl.roles_users_status !=2",
+        [req.body.email]
+      );
+      let user_permit = await pool.query(
+        "SELECT m.name_modules, ap.view_modules, ap.create_modules, ap.edit_modules, ap.delete_modules FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles INNER JOIN access_permits ap ON r.id_roles = ap.fk_id_roles INNER JOIN modules m ON ap.fk_id_modules  = m.id_modules WHERE u.email = ? AND rl.roles_users_status !=2",
+        [req.body.email]
+      );
+      if (Object.entries(user_auth).length === 0) {
         res.status(404).json({
           status: false,
-          message: "Todos los campos son obligatorios.",
+          message:
+            "El usuario esta desactivado comunicarse con el administrador.",
         });
       } else {
-        // exist email user
-        const exist_email = await pool.query(
-          "SELECT * FROM users WHERE email = ?",
-          [req.body.email]
-        );
-        if (Object.entries(exist_email).length === 0) {
+        // validation required fields
+        if (req.body.email == "" || req.body.password_user == "") {
           res.status(404).json({
             status: false,
-            message: "Correo electronico ó contraseña incorrectos.",
+            message: "Todos los campos son obligatorios.",
           });
         } else {
-          // exist password user database
-          const exist_password = await pool.query(
-            "SELECT * FROM users WHERE password_user = ? AND email = ?",
-            [req.body.password_user, req.body.email]
+          // exist email user
+          const exist_email = await pool.query(
+            "SELECT * FROM users WHERE email = ?",
+            [req.body.email]
           );
-          if (Object.entries(exist_password).length === 0) {
+          if (Object.entries(exist_email).length === 0) {
             res.status(404).json({
               status: false,
               message: "Correo electronico ó contraseña incorrectos.",
             });
           } else {
-            // login user database
-            let token = jsonwebtoken.sign(req.body.email, JWT_SECRET);
-            res.status(200).send({
-              singend_user: user_auth[0],
-              permit: user_permit,
-              token: token,
-            });
+            // exist password user database
+            const exist_password = await pool.query(
+              "SELECT * FROM users WHERE password_user = ? AND email = ?",
+              [req.body.password_user, req.body.email]
+            );
+            if (Object.entries(exist_password).length === 0) {
+              res.status(404).json({
+                status: false,
+                message: "Correo electronico ó contraseña incorrectos.",
+              });
+            } else {
+              // login user database
+              let token = jsonwebtoken.sign(req.body.email, JWT_SECRET);
+              res.status(200).send({
+                singend_user: user_auth[0],
+                permit: user_permit,
+                token: token,
+              });
+            }
           }
         }
       }

@@ -6,7 +6,6 @@ var config = require("../config");
 
 const RecaptchaMiddelware = (req: Request, res: Response, next: any) => {
   var token: any;
-
   if (req.body.token === undefined || req.body.token === null) {
     token = req.headers["x-token"];
   } else {

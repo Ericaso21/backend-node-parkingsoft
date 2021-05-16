@@ -4,6 +4,7 @@ import cors from "cors";
 import methdOverride from "method-override";
 import bodyParser from "body-parser";
 import helmet from "helmet";
+import fileUpload from "express-fileupload";
 
 //import routes
 import healthRoutes from "./routes/healthRoutes";
@@ -35,6 +36,7 @@ class Server {
     this.app.set("port", process.env.PORT || 3000);
     this.app.use(morgan("dev"));
     this.app.use(cors());
+    this.app.use(fileUpload());
     this.app.use(bodyParser.json());
     this.app.use(bodyParser.urlencoded({ extended: false }));
     this.app.use(methdOverride());
@@ -44,6 +46,7 @@ class Server {
   //routes api
   routes(): void {
     //route health check status 200 and healthy
+    this.app.use("/api/public", express.static("public"));
     this.app.use("/health", healthRoutes);
     this.app.use("/api/authentication", RecaptchaMiddelware, authController);
     this.app.use("/api/roles", RecaptchaMiddelware, roleshRoutes);
