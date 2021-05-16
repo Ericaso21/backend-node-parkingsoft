@@ -12,6 +12,12 @@ class UserRoutes {
 
   config(): void {
     this.router.get("/list", userController.list);
+    this.router.get("/profile/:id", userController.userProfile);
+    this.router.put("/updateProfile/:id", userController.updateUserProfile);
+    this.router.post(
+      "/updateProfileImage/:id",
+      userController.updateProfileImage
+    );
     this.router.get("/getOne/:id", userController.getOne);
     this.router.post("/create", userController.create);
     this.router.put("/update/:id", userController.update);

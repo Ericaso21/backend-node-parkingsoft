@@ -1,7 +1,79 @@
 import { Request, Response } from "express";
 import pool from "../database";
+import path from "path";
 
 class UserController {
+  //user profile
+
+  public async userProfile(req: Request, res: Response) {
+    const { id } = req.params;
+    let userProfile = await pool.query(
+      "SELECT u.document_number, u.name_user, concat_ws(' ',u.first_name,u.second_name) AS first_name, concat_ws(' ', u.surname,u.second_surname) AS surname, TIMESTAMPDIFF(YEAR, u.birthdate, CURDATE()) AS birthdate, u.address, u.telephone, u.email, u.name_file, r.name_role, r.description_role FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number INNER JOIN roles r ON rl.pk_fk_id_roles = r.id_roles WHERE u.email = ?",
+      [id]
+    );
+    res.status(200).json(userProfile[0]);
+  }
+
+  //update useProfile
+  public async updateUserProfile(req: Request, res: Response) {
+    const { id } = req.params;
+    const userProfile = {
+      first_name: req.body.first_name,
+      second_name: req.body.second_name,
+      surname: req.body.surname,
+      second_surname: req.body.second_surname,
+      name_user: req.body.name_user,
+      address: req.body.address,
+      email: req.body.email,
+      telephone: req.body.telephone,
+    };
+    let update = await pool.query(
+      "UPDATE users SET ? WHERE document_number = ?",
+      [userProfile, id]
+    );
+    if (update) {
+      res.status(200).json({
+        status: true,
+        message: "Datos actualizados correctamente.",
+      });
+    } else {
+      res
+        .status(404)
+        .json({ status: false, message: "No se pudo actualizar." });
+    }
+  }
+
+  //update profile image
+  public async updateProfileImage(req: any, res: any) {
+    if (req.files === null) {
+      res
+        .status(404)
+        .json({ status: false, message: "No hemos encontrado la imagen" });
+    } else {
+      const { id } = req.params;
+      let image = {
+        name_file: req.files.File.name,
+        type_file: req.files.File.mimetype,
+      };
+      let updateImage = await pool.query(
+        "UPDATE users SET ? WHERE document_number = ?",
+        [image, id]
+      );
+      if (updateImage) {
+        var file = req.files.File;
+        file.mv(`./public/static/img/user/${file.name}`, (err: any) => {
+          if (err) return res.status(500).send({ message: err });
+          return res
+            .status(200)
+            .send({ status: true, message: "Imagen actualizada" });
+        });
+      } else {
+        res
+          .status(404)
+          .json({ status: false, message: "No se pudo actualizar." });
+      }
+    }
+  }
   // list user
   public async list(req: Request, res: Response) {
     let users = await pool.query(
@@ -76,12 +148,10 @@ class UserController {
           ]);
           if (role_user) {
             // response message servidor and cliente
-            res
-              .status(200)
-              .json({
-                status: true,
-                message: "Datos guardados correctamente.",
-              });
+            res.status(200).json({
+              status: true,
+              message: "Datos guardados correctamente.",
+            });
           }
         } else {
           // response error servidor
@@ -89,13 +159,11 @@ class UserController {
         }
       } else {
         // response error client when recording data
-        res
-          .status(404)
-          .json({
-            status: false,
-            message:
-              "El documento ya existe ó correo electronico verificar tambien el nombre de usuario.",
-          });
+        res.status(404).json({
+          status: false,
+          message:
+            "El documento ya existe ó correo electronico verificar tambien el nombre de usuario.",
+        });
       }
     }
   }
@@ -148,12 +216,10 @@ class UserController {
           [role, id]
         );
         if (update_role) {
-          res
-            .status(200)
-            .json({
-              status: true,
-              message: "Datos actualizados correctamente.",
-            });
+          res.status(200).json({
+            status: true,
+            message: "Datos actualizados correctamente.",
+          });
         } else {
           res
             .status(404)
@@ -165,13 +231,11 @@ class UserController {
           .json({ status: false, message: "No se pudo actualizar." });
       }
     } else {
-      res
-        .status(404)
-        .json({
-          status: false,
-          message:
-            "El correo electronico, nombre de usuario ó documento de identidad estan asociados a otro usuario.",
-        });
+      res.status(404).json({
+        status: false,
+        message:
+          "El correo electronico, nombre de usuario ó documento de identidad estan asociados a otro usuario.",
+      });
     }
   }
 
@@ -192,13 +256,11 @@ class UserController {
           .json({ status: true, message: "Usuario eliminado con exito." });
       }
     } else {
-      res
-        .status(404)
-        .json({
-          status: false,
-          message:
-            "El usuario no se puede eliminar por que esta asociado a un vehiculo.",
-        });
+      res.status(404).json({
+        status: false,
+        message:
+          "El usuario no se puede eliminar por que esta asociado a un vehiculo.",
+      });
     }
   }
 }
