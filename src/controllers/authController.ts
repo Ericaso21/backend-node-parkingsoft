@@ -2,8 +2,60 @@ import { Request, Response } from "express";
 import pool from "../database";
 import jsonwebtoken from "jsonwebtoken";
 var config = require("../config");
+import { transporter } from "../nodemailer";
 
 class AuthController {
+  //reset password email
+  public async resetPassword(req: Request, res: Response) {
+    const { email } = req.body;
+    const existEmail = await pool.query(
+      "SELECT first_name, surname, email FROM users WHERE email = ?",
+      [email]
+    );
+    const emailUser = Buffer.from(existEmail[0]["email"]).toString("base64");
+    const url = `${config.URIFROTEND}/${emailUser}`;
+    if (Object.entries(existEmail).length === 0) {
+      res.status(404).json({
+        status: false,
+        message:
+          "Tuvimos un error en verficar su correo comuniquese con el Administrador.",
+      });
+    } else {
+      await transporter.sendMail({
+        from: '"Restablecer contraseña" <essolarte1@misena.edu.co>', // sender address
+        to: email, // list of receivers
+        subject: "Restablecer contraseña  ✔", // Subject line
+        html: `
+        <h1>Usuario: ${existEmail[0]["first_name"]} ${existEmail[0]["surname"]}</h1>
+        <b> Para recuperar su contraseña hacer click en el siguiente link</b>
+        <a href="${url}">${url}</a>
+        `, // html body
+      });
+      res
+        .status(200)
+        .json({ status: true, message: "Revisar su correo electronico" });
+    }
+  }
+
+  //new Password
+  public async newPassword(req: Request, res: Response) {
+    const email = Buffer.from(req.body.email.id, "base64").toString("binary");
+    let existEmail = await pool.query(
+      "UPDATE users SET password_user = ? WHERE email = ?",
+      [req.body.newPassword, email]
+    );
+    if (existEmail) {
+      res.status(200).json({
+        status: true,
+        message: "Contraseña actualizada correctamente.",
+      });
+    } else {
+      res.status(500).json({
+        status: false,
+        message: "Error del servidor",
+      });
+    }
+  }
   // create client user database
   public async create(req: Request, res: Response) {
     // delete token recaptcha
@@ -86,7 +138,7 @@ class AuthController {
       });
     } else {
       let user_auth = await pool.query(
-        "SELECT u.first_name, u.second_name, u.surname, u.second_surname, u.email, u.name_file FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE u.email = ? AND rl.roles_users_status !=2",
+        "SELECT u.first_name, u.second_name, u.surname, u.second_surname, u.email, u.name_file, rl.pk_fk_id_roles FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE u.email = ? AND rl.roles_users_status !=2",
         [req.body.email]
       );
       let user_permit = await pool.query(
