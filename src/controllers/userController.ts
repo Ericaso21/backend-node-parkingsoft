@@ -43,6 +43,21 @@ class UserController {
     }
   }
 
+  //getUserdata UpdateProfile
+  public async getUserData(req: Request, res: Response) {
+    let user_auth = await pool.query(
+      "SELECT u.first_name, u.second_name, u.surname, u.second_surname, u.email, u.name_file, rl.pk_fk_id_roles FROM users u INNER JOIN roles_users rl ON u.document_number = rl.pk_fk_document_number WHERE u.email = ? AND rl.roles_users_status !=2",
+      [req.body.email]
+    );
+    if (Object.entries(user_auth).length === 0) {
+      res
+        .status(400)
+        .json({ status: false, message: "No se ha encontrado data" });
+    } else {
+      res.status(200).json(user_auth[0]);
+    }
+  }
+
   //update profile image
   public async updateProfileImage(req: any, res: any) {
     if (req.files === null) {

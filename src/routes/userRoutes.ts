@@ -18,6 +18,7 @@ class UserRoutes {
       "/updateProfileImage/:id",
       userController.updateProfileImage
     );
+    this.router.post("/userData", userController.getUserData);
     this.router.get("/getOne/:id", userController.getOne);
     this.router.post("/create", userController.create);
     this.router.put("/update/:id", userController.update);
