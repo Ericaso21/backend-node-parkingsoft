@@ -2,20 +2,20 @@ const request = require("supertest");
 
 const app = require("../build/index");
 
-describe("GET /api/roles/list", () => {
+describe("GET /api/blockTypes/list", () => {
   it("Response get roles api", (done) => {
     request(app)
-      .get("/api/roles/list")
+      .get("/api/blockTypes/list")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(200, done);
   });
 });
 
-describe("GET /api/roles/getOne/:id", () => {
+describe("GET /api/blockTypes/getOne/:id", () => {
   it("Response get one role api", (done) => {
     request(app)
-      .get("/api/roles/getOne/1")
+      .get("/api/blockTypes/getOne/1")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(200, done);
@@ -23,11 +23,11 @@ describe("GET /api/roles/getOne/:id", () => {
 
   it("Response get one role not found", (done) => {
     request(app)
-      .get("/api/roles/getOne/10")
+      .get("/api/blockTypes/getOne/10")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(404)
-      .expect('{"status":false,"message":"Rol no encontrado."}')
+      .expect('{"status":false,"message":"El tipo de bloque no existe."}')
       .end((err) => {
         if (err) return done(err);
         done();
@@ -35,16 +35,15 @@ describe("GET /api/roles/getOne/:id", () => {
   });
 });
 
-describe("POST /api/roles/create", () => {
+describe("POST /api/blockTypes/create", () => {
   it("responde with 200 created", (done) => {
     const data = {
-      name_role: "RolPrueba2",
-      description_role: "Prueba test role",
-      role_status: "2",
+      name_block_type: "RolPrueba2",
+      block_status: "2",
       created_att: new Date(),
     };
     request(app)
-      .post("/api/roles/create")
+      .post("/api/blockTypes/create")
       .send(data)
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
@@ -57,18 +56,17 @@ describe("POST /api/roles/create", () => {
 
   it("response with 404 not found role it already exists", (done) => {
     const data = {
-      name_role: "RolPrueba",
-      description_role: "Prueba test role",
-      role_status: "2",
+      name_block_type: "RolPrueba2",
+      block_status: "2",
       created_att: new Date(),
     };
     request(app)
-      .post("/api/roles/create")
+      .post("/api/blockTypes/create")
       .send(data)
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(404)
-      .expect('{"status":false,"message":"El nombre del rol ya existe."}')
+      .expect('{"status":false,"message":"El tipo de bloque ya existe."}')
       .end((err) => {
         if (err) return done(err);
         done();
@@ -76,16 +74,15 @@ describe("POST /api/roles/create", () => {
   });
 });
 
-describe("PUT /api/roles/update/:id", () => {
+describe("PUT /api/blockTypes/update/:id", () => {
   it("response with 200 updated", (done) => {
     const data = {
-      name_role: "RolPrueba",
-      description_role: "Prueba test role",
-      role_status: "1",
-      updated_att: new Date(),
+      name_block_type: "RolPrueba2",
+      block_status: "1",
+      created_att: new Date(),
     };
     request(app)
-      .put("/api/roles/update/4")
+      .put("/api/blockTypes/update/4")
       .send(data)
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
@@ -98,13 +95,12 @@ describe("PUT /api/roles/update/:id", () => {
 
   it("response with 404 role name it already exists", (done) => {
     const data = {
-      name_role: "Administrador",
-      description_role: "Prueba test role",
-      role_status: "1",
-      updated_att: new Date(),
+      name_block_type: "RolPrueba2",
+      block_status: "1",
+      created_att: new Date(),
     };
     request(app)
-      .put("/api/roles/update/4")
+      .put("/api/blockTypes/update/5")
       .send(data)
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
@@ -119,10 +115,10 @@ describe("PUT /api/roles/update/:id", () => {
   });
 });
 
-describe("DELETE /api/roles/delete/:id", () => {
+describe("DELETE /api/blockTypes/delete/:id", () => {
   it("response with 200 deleted", (done) => {
     request(app)
-      .delete("/api/roles/delete/4")
+      .delete("/api/blockTypes/delete/5")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(200, done);
@@ -130,12 +126,12 @@ describe("DELETE /api/roles/delete/:id", () => {
 
   it("response with 404 role not found deleted", (done) => {
     request(app)
-      .delete("/api/roles/delete/1")
+      .delete("/api/blockTypes/delete/1")
       .set("Accept", "application/json")
       .expect("Content-Type", /json/)
       .expect(404)
       .expect(
-        '{"status":false,"message":"El rol esta asociado a uno o varios empleados no se puede eliminar."}'
+        '{"status":false,"message":"El tipo de bloque existe en el bloque."}'
       )
       .end((err) => {
         if (err) return done(err);

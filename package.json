@@ -9,7 +9,7 @@
     "build:prod": "tsc",
     "development": "cross-env NODE_ENV=development&& nodemon build/index.js",
     "production": "cross-env NODE_ENV=production&& nodemon build/index.js",
-    "test": "cross-env NODE_ENV=test mocha --exit"
+    "test": "tsc && cross-env NODE_ENV=test mocha --exit"
   },
   "keywords": [],
   "author": "Eric Solarte",
