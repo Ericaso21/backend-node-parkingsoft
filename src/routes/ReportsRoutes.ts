@@ -12,6 +12,7 @@ class ReportRoutes {
 
   config(): void {
     this.router.get("/list", reportController.list);
+    this.router.post("/filter", reportController.filter);
   }
 }
 
