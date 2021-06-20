@@ -73,7 +73,7 @@ class GlobalController {
   //brind data vehicle
   public async listVehicle(req: Request, res: Response) {
     let vehicle = await pool.query(
-      "SELECT v.vehicle_plate, u.document_number, u.first_name, u.surname FROM vehicles v INNER JOIN users u ON v.fk_document_number = u.document_number WHERE v.vehicle_status != 0"
+      "SELECT v.vehicle_plate, u.document_number, u.first_name, u.surname, vt.vehicle_name FROM vehicles v INNER JOIN users u ON v.fk_document_number = u.document_number INNER JOIN vehicle_types vt ON v.fk_id_vehicle_type = vt.id_vehicle_type WHERE v.vehicle_status != 0"
     );
     res.status(200).json(vehicle);
   }
